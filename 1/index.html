@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+</head>
+  <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Project 1: Colorizing the Prokudin-Groskii Photo Collection</h1>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+  <div style="margin-top: 100px;">
+    <h3 style="text-align: left; font-weight: bold; margin-left:200px;">Introduction</h3>
+    <p style="text-align: left; margin-left: 220px; margin-right: 220px; margin-top: 20px;">
+      Sergei Mikhailovich Prokudin-Gorskii (1863-1944) [Сергей Михайлович Прокудин-Горский, to his Russian friends] was a man well ahead of his time. Convinced, as early as 1907, 
+      that color photography was the wave of the future, he won Tzar's special permission to travel across the vast Russian Empire and take color photographs of everything he saw 
+      including the only color portrait of Leo Tolstoy. And he really photographed everything: people, buildings, landscapes, railroads, bridges... thousands of color pictures! 
+      His idea was simple: record three exposures of every scene onto a glass plate using a red, a green, and a blue filter. Never mind that there was no way to print color photographs until much later 
+      -- he envisioned special projectors to be installed in "multimedia" classrooms all across Russia where the children would be able to learn about their vast country. Alas, his plans never materialized: 
+      he left Russia in 1918, right after the revolution, never to return again. Luckily, his RGB glass plate negatives, 
+      capturing the last years of the Russian Empire, survived and were purchased in 1948 by the Library of Congress. 
+      The LoC has recently digitized the negatives and made them available on-line.
+  </p>
+
+  <h3 style="text-align: left; font-weight: bold; margin-left:200px;">Goal</h3>
+  <p style="text-align: left; margin-left: 220px; margin-right: 220px; margin-top: 20px;">
+    Walk through the colorization attempt of Prokudin-Gorskii's pictures
+  </p>
+</div>
+
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Alignment Process</h3>
+  
+  <div style="margin-top: 20px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Input Images</h4>
+      <div style="display: flex; justify-content: center; align-items: center;">
+          <img src="./data/emir.tif" style="width: 15%; height: auto; margin-right: 10px;">
+          <img src="./data/cathedral.jpg" style="width: 15%; height: auto; margin-left: 10px;">
+      </div>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          The input image will be a negative, as shown above, and we will have to split the three color channels (Blue, Green, Red -- this is the order of the channels from top to bottom
+          in the negative) and align them. It isn't possible to place the three different color channels right on top of each other without some image processing, because the pictures are translated
+          from another. As seen here:
+      </p>
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <img src="./media/monastery_v1.jpg" style="width: 30%; height: auto">
+    </div>
+  </div>
+  
+  <div style="margin-top: 40px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Alignment Metric and Exhasutive Search</h4>
+      <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
+          <img src="./media/cathedral_v1.jpg" style="width: 30%; height: auto; margin-right: 10px;">
+          <img src="./media/monastery_v1.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+          <img src="./media/tobolsk_v1.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+      </div>
+      <p style="margin-left: 240px; margin-right: 240px">
+          Images after being inputed are represented as an array where each element in the is a pixel's brightness. Since the pixel brightness are relatively similar, we can use
+          those and align the pictures. To see how close two images, we can take exhaustively search over some pixel displament window. I used [-15, 15]. At each displacement, we compare the
+          two pictures by some alignment metric telling us how close the two pictures are. There are many one could try but the two I tried were L2 Norm (or Euclidean Distance) and Normal Cross-Correlation (NCC).
+          To me they were similar, so I stuck with L2 Norm.
+          <br>
+          As seen above, just aligning the pictures with no preprocessing works decently for some pictures and not well at all for others.
+      </p>
+  </div>
+  
+  <div style="margin-top: 40px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Improved Alignment by Looking at Internal Pixels</h4>
+      <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
+          <img src="./media/cathedral_v1_crop.jpg" style="width: 30%; height: auto; margin-right: 10px;">
+          <img src="./media/monastery_v1_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+          <img src="./media/tobolsk_v1_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+      </div>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          The image's boarders are darker, chopped off, etc, this makes the calculation of the metric to be skewed causing misalignment. To improve alignment of pictures, 
+          it is better to look at the the internal pixels of the pictures. Now we can run the searching algorithm to a cropped version of the picture and apply the displacement found
+          to the uncropped version. 
+          <br>
+          Even though we won't be looking a chunk of the edges of the picture, it is fine because most of the detail of the pictures we are looking at is in the general center of the image. Thus, we will
+          still get a nicely aligned uncropped image.
+      </p>
+  </div>
+  
+  <div style="margin-top: 40px;">
+      <h4 style="margin-left: 240px;font-weight: bold;">Image Pyramid</h4>
+      <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
+          <img src="./media/three_generations_v2_crop.jpg" alt="Image 9" style="width: 30%; height: auto; margin-right: 10px;">
+          <img src="./media/train_v2_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+          <img src="./media/icon_v2_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+      </div>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        Exhastive search with a relatively small pixel window such as [-15,15] works well for lower resolution images, because there are less pixels so don't have to shift the image around as much to
+        find a match. For higher resolution pictures, this searching method becomes a problem because we would need to increase the search window which will take forever to align higher resolution
+        photos.
+      </p>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 5px">
+        A solution to this problem is to construct a image pyramid where we will downscale the image (I downscaled by a factor of 2), and apply the exhastive search on
+        a lower resolution version of the image. We will then use the higher level's (lower resolution image's) offset to shift the next level's image and begin our exhastive search on it.
+        The idea is get the broad details of the image aligned from the lower resolution version of the image, and apply that shift to the next resolution; as we get higher and higher resolution, 
+        we align on the finer details.
+      </p>
+  </div>
+  
+  <div style=" margin-top: 40px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Better Alignment with Edge Detection</h4>
+      <div style="margin-left: 240px; margin-right: 240px;display: flex; justify-content: center; align-items: center;">
+          <img src="./media/emir_v2_crop.jpg" style="width: 30%; height: auto; margin-right: 10px;">
+          <img src="./media/church_v2_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+      </div>
+      
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          While aligning on pixel brightness values works for many images, it fails to work for images that are saturated with one color in a specific area. 
+          <br>
+          For instance, aligning on pixel brightness fails on the emir's picture and church picture because there is a lot of one color, say blue in the emir's robe and blue in much of the background
+          of the church. 
+          This saturation of color in one area throws of the calculation of the metric in the alignment process. 
+      </p>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        A solution to this problem is align based on edges instead. In my image processing pipeline, I chose to employ Canny Edge Detection.
+    </p>
+
+      <div style="margin-left: 240px; margin-right: 240px; margin-top: 20px; display: flex; justify-content: center; align-items: center;">
+        <img src="./media/emir_v3_crop.jpg" style="width: 30%; height: auto; margin-right: 10px;">
+        <img src="./media/church_v3_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
+    </div>
+  </div>
+</div>
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px;">Final Images</h3>
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+    All the processed images can be found here: <a href="https://www.w3schools.com/" target="_blank">Visit W3Schools</a>
+  </p>
+
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px;">Final Image Offsets</h3>
+
+  <table style="width: 69%; justify-content: center; border-collapse: collapse; margin-left: 240px; margin-top: 20px;">
+      <thead>
+          <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Image Name</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Green Offset</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Red Offset</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">cathedral</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(2,5)</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(3,12)</td>
+          </tr>
+          <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">monastery</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(2,-3)</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(2,3)</td>
+          </tr>
+          <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">tobolsk</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(3,3)</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">(3,6)</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">train</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">(8, 40)</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">(32, 88)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">church</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(0, 24)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(-8, 56)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">emir</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(24, 48)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(40, 104)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">harvesters</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(16, 56)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(24, 88)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">icon</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(8, 56)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(8, 112)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">lady</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(8, 56)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(8, 112)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">melons</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(8, 80)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(16, 176)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">onion_church</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(24, 48)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(40, 104)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">sculpture</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(-8, 32)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(-24, 136)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">self_portrait</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(32, 80)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(40, 176)</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">three_generations</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(16, 48)</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">(16, 112)</td>
+        </tr>
+      </tbody>
+  </table>  
+  <div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
+</body>
+</html>
