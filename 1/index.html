@@ -50,16 +50,16 @@
   </div>
   
   <div style="margin-top: 40px;">
-      <h4 style="margin-left: 240px; font-weight: bold;">Alignment Metric and Exhasutive Search</h4>
+      <h4 style="margin-left: 240px; font-weight: bold;">Alignment Metric and Exhaustive Search</h4>
       <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
           <img src="./media/cathedral_v1.jpg" style="width: 30%; height: auto; margin-right: 10px;">
           <img src="./media/monastery_v1.jpg" style="width: 30%; height: auto; margin-left: 10px;">
           <img src="./media/tobolsk_v1.jpg" style="width: 30%; height: auto; margin-left: 10px;">
       </div>
       <p style="margin-left: 240px; margin-right: 240px">
-          Images after being inputed are represented as an array where each element in the is a pixel's brightness. Since the pixel brightness are relatively similar, we can use
-          those and align the pictures. To see how close two images, we can take exhaustively search over some pixel displament window. I used [-15, 15]. At each displacement, we compare the
-          two pictures by some alignment metric telling us how close the two pictures are. There are many one could try but the two I tried were L2 Norm (or Euclidean Distance) and Normal Cross-Correlation (NCC).
+          Images after being inputed are represented as an array where each element in matrix is the pixel's brightness. Since the pixel brightness are relatively similar, we can use
+          those and align the pictures. To see how close two images, we can exhaustively search over some pixel displament window. I used [-15, 15]. At each displacement, we compare the
+          two pictures by some alignment metric telling us how close the two pictures are. There are many that one could try but the two I tried were L2 Norm (or Euclidean Distance) and Normal Cross-Correlation (NCC).
           To me they were similar, so I stuck with L2 Norm.
           <br>
           As seen above, just aligning the pictures with no preprocessing works decently for some pictures and not well at all for others.
@@ -74,11 +74,11 @@
           <img src="./media/tobolsk_v1_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
       </div>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-          The image's boarders are darker, chopped off, etc, this makes the calculation of the metric to be skewed causing misalignment. To improve alignment of pictures, 
-          it is better to look at the the internal pixels of the pictures. Now we can run the searching algorithm to a cropped version of the picture and apply the displacement found
+          The images' boarders are darker, chopped off, etc, this makes the calculation of the metric to be skewed causing misalignment. To improve alignment of pictures, 
+          it is better to look at the internal pixels of the pictures. Now we can run the searching algorithm to a cropped version of the picture and apply the displacement found
           to the uncropped version. 
           <br>
-          Even though we won't be looking a chunk of the edges of the picture, it is fine because most of the detail of the pictures we are looking at is in the general center of the image. Thus, we will
+          Even though we won't be looking at a chunk of the edges of the picture, it is fine because most of the detail of the pictures we are looking at is in the general center of the image. Thus, we will
           still get a nicely aligned uncropped image.
       </p>
   </div>
@@ -91,13 +91,12 @@
           <img src="./media/icon_v2_crop.jpg" style="width: 30%; height: auto; margin-left: 10px;">
       </div>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-        Exhastive search with a relatively small pixel window such as [-15,15] works well for lower resolution images, because there are less pixels so don't have to shift the image around as much to
-        find a match. For higher resolution pictures, this searching method becomes a problem because we would need to increase the search window which will take forever to align higher resolution
-        photos.
+        Exhaustive search with a small pixel window such as [-15,15] works well for lower resolution images, because there are less pixels to search so you don't have to shift the image around as much to
+        find a match. For higher resolution pictures, this searching method becomes a problem because we would need to increase the search window which will take forever to align.
       </p>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 5px">
-        A solution to this problem is to construct a image pyramid where we will downscale the image (I downscaled by a factor of 2), and apply the exhastive search on
-        a lower resolution version of the image. We will then use the higher level's (lower resolution image's) offset to shift the next level's image and begin our exhastive search on it.
+        A solution to this problem is to construct an image pyramid where we will downscale the image (I downscaled by a factor of 2), and apply the exhaustive search on
+        a lower resolution version of the image. We will then use the higher level's (lower resolution image's) offset to shift the next level's image and begin our exhaustive search on it.
         The idea is get the broad details of the image aligned from the lower resolution version of the image, and apply that shift to the next resolution; as we get higher and higher resolution, 
         we align on the finer details.
       </p>
@@ -113,12 +112,12 @@
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
           While aligning on pixel brightness values works for many images, it fails to work for images that are saturated with one color in a specific area. 
           <br>
-          For instance, aligning on pixel brightness fails on the emir's picture and church picture because there is a lot of one color, say blue in the emir's robe and blue in much of the background
+          For instance, aligning on pixel brightness fails on the emir picture and church picture because there is a lot of one color, say, blue in the emir's robe and blue in much of the background
           of the church. 
-          This saturation of color in one area throws of the calculation of the metric in the alignment process. 
+          This saturation of color in one area throws off the calculation of the metric in the alignment process. 
       </p>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-        A solution to this problem is align based on edges instead. In my image processing pipeline, I chose to employ Canny Edge Detection.
+        A solution to this problem is to align based on edges instead. In my image processing pipeline, I chose to employ Canny Edge Detection.
     </p>
 
       <div style="margin-left: 240px; margin-right: 240px; margin-top: 20px; display: flex; justify-content: center; align-items: center;">
