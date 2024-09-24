@@ -1,0 +1,630 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+  <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Project 2: Fun with Filters and Frequencies!</h1>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+  <div style="margin-top: 50px;">
+    <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
+      <img src="./data/im_dog_binary.png" style="width: 24%; height: auto; margin-right: 10px;">
+      <img src="./data/taj_alpha3.png" style="width: 24%; height: auto; margin-left: 10px;">
+      <img src="./data/final_orple.png" style="width: 24%; height: auto; margin-left: 10px;">
+    </div>
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <h3 style="text-align: left; font-weight: bold; margin-left:200px;">Introduction</h3>
+    <p style="text-align: left; margin-left: 220px; margin-right: 220px;">
+      In this project, we explored various techniques for manipulating and processing images by analyzing their frequency components. 
+      By applying frequency-based filters, we were able to enhance images in multiple ways, including edge detection, sharpening, and blending. 
+      We also created hybrid images by combining high-frequency details from one image with the low-frequency components of 
+      another, resulting in visually striking effects. Additionally, image blending was performed to seamlessly merge images, demonstrating how frequency 
+      manipulation can be a powerful tool in image processing.
+  </p>
+</div>
+<hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 1: Fun with Filters</h3>
+  
+  <div style="margin-top: 20px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Part 1.1: Finite Difference Operator</h4>
+        <p style="font-size: 200%; justify-content: center;">
+        \[
+        \mathbf{D_x} = \begin{bmatrix} -1 & 1 \end{bmatrix}, \quad \mathbf{D_y} = \begin{bmatrix} 1 \\ -1 \end{bmatrix}, \quad
+        \| \nabla f \| = \sqrt{\left( \frac{\partial f}{\partial x} \right)^2 + \left( \frac{\partial f}{\partial y} \right)^2}
+        \]
+        </p>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          By convolving the image with a difference operator, we can create a map to see the change in spatial frequency. In other words,
+          we are seeing the change in the intensity of the pixels' brightness as we move across the image.
+          For example, areas where this change in spatial frequency is high is on the edges of an image. So, we can use this idea to edge detect.
+          <br>
+          <br>
+          The approach is to take an image and convolve it with the finite difference operator in each direction, x and y, then calculate the
+          magnitude of the gradient which will give the total rate of change in intensity, regardless of direction. We then binarize the image
+          by choosing a threshold to remove as much noise as possible whilst perserving most of the real edges. To binarize the image, 
+          pixels that are greater then some threshold get set
+          to 1; otherwise, they are set to 0. Playing around with the threshold number
+          allows us to remove the noise.
+      </p>
+
+      <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 3px;">  <!-- Increased margin -->
+            <img src="./data/cameraman.png" style="width: 90%; height: auto">
+            <p>Original</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">  <!-- Increased margin -->
+            <img src="./data/im_edge_dx.png" style="width: 90%; height: auto">
+            <p>Partial derivative in x-direction</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">  <!-- Increased margin -->
+            <img src="./data/im_edge_dy.png" style="width: 90%; height: auto">
+            <p>Partial derivative in y-direction</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">  <!-- Increased margin -->
+          <img src="./data/im_grad_mag.png" style="width: 90%; height: auto">
+          <p>Gradient Magnitude</p>
+      </div>
+      <div style="text-align: center; margin: 0 3px;">  <!-- Increased margin -->
+        <img src="./data/im_binary.png" style="width: 90%; height: auto">
+        <p>Binarized (Threshold = 67)</p>
+      </div>
+    </div>
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+  <div style="margin-top: 40px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Part 1.2: Derivative of Gaussian (DoG) Filter</h4>
+      <p style="margin-left: 240px; margin-right: 240px">
+          As seen in the partial derivative images, it is quite noisy, especially near the grassy area. This throws off our edge detection, as seen in the binarized
+          image.
+          We can remedy this by blurring the image first, and then applying a difference operator. The smoothing/blurring acts as a low-pass filter -
+          smoothening out the higher frequencies, since the edges have very high frequency they will still be relatively preversed in the filtered image.
+      </p>
+
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 50px">
+        <b>1.</b> Applying Gaussian blur then applying finite difference operator in each direction.
+      </p>
+
+      <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 3px;"> 
+            <img src="./data/im_blur.png" style="width: 90%; height: auto">
+            <p> Gaussian Blur (&#963; = 1) </p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">
+            <img src="./data/im_blur_edge_dx.png" style="width: 90%; height: auto">
+            <p>Partial derivative in x-direction</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">  
+            <img src="./data/im_blur_edge_dy.png" style="width: 90%; height: auto">
+            <p>Partial derivative in y-direction</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">  
+          <img src="./data/im_blur_grad_mag.png" style="width: 90%; height: auto">
+          <p>Gradient Magnitude</p>
+      </div>
+      <div style="text-align: center; margin: 0 3px;"> 
+        <img src="./data/im_blur_binary.png" style="width: 90%; height: auto">
+        <p>Binarized (Threshold = 28)</p>
+      </div>
+    </div>
+
+    <p style="margin-left: 240px; margin-right: 240px; margin-top: 10px">
+      <b>Reflection:</b> After the smoothening the image, the edges have become more distinct. The noise has also
+      decreased.
+    </p>
+
+    <p style="margin-left: 240px; margin-right: 240px; margin-top: 50px">
+      <b>2.</b> Convolution is commutative and associative, so it is possible to take the difference of Gaussian.
+      In other words, we can convolve the difference operator and Gaussian kernel to create a DoG filter,
+      and then apply it to the image.      
+    </p>
+
+    <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+      <div style="text-align: center; margin: 0 3px;">
+          <img src="./data/im_dog_dx.png" style="width: 90%; height: auto">
+          <p>Partial derivative in x-direction</p>
+      </div>
+      <div style="text-align: center; margin: 0 3px;">  
+          <img src="./data/im_dog_dy.png" style="width: 90%; height: auto">
+          <p>Partial derivative in y-direction</p>
+      </div>
+      <div style="text-align: center; margin: 0 3px;">  
+        <img src="./data/im_dog_grad_mag.png" style="width: 90%; height: auto">
+        <p>Gradient Magnitude</p>
+    </div>
+    <div style="text-align: center; margin: 0 3px;"> 
+      <img src="./data/im_dog_binary.png" style="width: 90%; height: auto">
+      <p>Binarized (Threshold = 28)</p>
+    </div>
+  </div>
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 10px">
+    <b>Reflection:</b> As suspected the result is the same.
+  </p>
+  </div>
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 2: Fun with Frequencies</h3>
+      <h4 style="margin-left: 240px; font-weight: bold;">Part 2.1: Image "Sharpening"</h4>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          We are able to sharpen images by adding some of the higher frequencies back to the image. This is achieved by doing a low-pass filter on the original image
+          then subtracting it from original image. This leaves us with an image with high frequencies then we can add this back to the original image. We can also multiply the
+          high frequency image by a scaler (alpha) to sharpen the image further.
+
+      </p>
+
+      <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 10px;">
+            <img src="./data/taj.jpg" style="width: 100%; height: auto">
+            <p>Original</p>
+        </div>
+        <div style="text-align: center; margin: 0 10px;">  
+            <img src="./data/taj_low.png" style="width: 100%; height: auto">
+            <p>Low Frequencies</p>
+        </div>
+        <div style="text-align: center; margin: 0 10px;">  
+          <img src="./data/taj_high.png" style="width: 100%; height: auto">
+          <p>High Frequencies</p>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 10px; margin-left: 240px; margin-right: 240px;">
+      <div style="text-align: center; margin: 0 10px;">
+          <img src="./data/taj_alpha1.png" style="width: 100%; height: auto">
+          <p>&alpha; = 1</p>
+      </div>
+      <div style="text-align: center; margin: 0 10px;">  
+          <img src="./data/taj_alpha3.png" style="width: 100%; height: auto">
+          <p>&alpha; = 3</p>
+      </div>
+      <div style="text-align: center; margin: 0 10px;">  
+        <img src="./data/taj_alpha5.png" style="width: 100%; height: auto">
+        <p>&alpha; = 5</p>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+    <div style="text-align: center; margin: 0 10px;">
+        <img src="./data/starrynight.jpg" style="width: 100%; height: auto">
+        <p>Original</p>
+    </div>
+    <div style="text-align: center; margin: 0 10px;">  
+        <img src="./data/starry_low.png" style="width: 100%; height: auto">
+        <p>Low Frequencies</p>
+    </div>
+    <div style="text-align: center; margin: 0 10px;">  
+      <img src="./data/sharry_high.png" style="width: 100%; height: auto">
+      <p>High Frequencies</p>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 10px;">
+      <img src="./data/sharry_alpha1.png" style="width: 100%; height: auto">
+      <p>&alpha; = 1</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+      <img src="./data/sharry_alpha3.png" style="width: 100%; height: auto">
+      <p>&alpha; = 3</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/sharry_alpha5.png" style="width: 100%; height: auto">
+    <p>&alpha; = 5</p>
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 10px;">
+      <img src="./data/train.png" style="width: 100%; height: auto">
+      <p>Original</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+      <img src="./data/train_low.png" style="width: 100%; height: auto">
+      <p>Blurred</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/train_alpha2.png" style="width: 100%; height: auto">
+    <p>&alpha; = 2 </p>
+  </div>
+</div>
+
+<p style="margin-left: 240px; margin-right: 240px; margin-top: 10px">
+  A picture of a train from my phone's camera was already sharp, and after blurring it, and sharpening that blurred image didn't really affect it.
+  If you look closely, some of the writing on the train got sharper but it is very subtle. The original image is the sharpest because sharpening
+  can't restore lost data.
+</p>
+</div>
+
+
+
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+  <div style="margin-top: 40px;">
+        <h4 style="margin-left: 240px; font-weight: bold;">Part 2.2: Hybrid Images</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          We can create images that look different up close and further away; they are called hybrid images. This is done by keeping the higher frequencies of one image 
+          and the lower frequencies of another. The higher frequency image is seen up close and the lower frequency image is seen from further away.
+          <br>
+          <br>
+          I followed the approach outlined in a paper called Hybrid Images by Oliva, Torrabla, and Schyns.
+          The approach was to low-pass filter the image I want to be seen further away and high-pass filter the other, and added the images. The low-pass filter was a standard
+          Gaussian blur, and the high-pass filter was subtracting the Gaussian-filtered image from the original image.
+          <br>
+          <br>
+          I tried averaging the images, instead of adding, but I liked the look of the addition, so I stuck with that.
+  
+        </p>
+  
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+          <div style="text-align: center; margin: 0 1px;">
+              <img src="./data/DerekPicture.jpg" style="width: 75%; height: auto">
+              <p>Derek (Low Frequency Image)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+              <img src="./data/nutmeg.jpg" style="width: 70%; height: auto">
+              <p>Nutmeg (High Frequency Image)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data/derek_nutmeg.png" style="width: 100%; height: auto">
+            <p>Detmeg (Low &#963; = 5, High &#963; = 23)</p>
+        </div>
+      </div>
+
+
+
+      <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 1px;">
+            <img src="./data/submarine.jpg" style="width: 90%; height: auto">
+            <p>Submarine (Low Frequency Image)</p>
+        </div>
+        <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data/shark.jpg" style="width: 90%; height: auto">
+            <p>Shark (High Frequency Image)</p>
+        </div>
+        <div style="text-align: center; margin: 0 1px;">  
+          <img src="./data/subshark.png" style="width: 100%; height: auto">
+          <p>Sharksub (Low &#963; = 4, High &#963; = 2.5)</p>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+      <div style="text-align: center; margin: 0 1px;">
+          <img src="./data/elephant_draw.jpg" style="width: 120%; height: auto">
+          <p>Elephant Clip Art (Low Frequency Image)</p>
+      </div>
+      <div style="text-align: center; margin: 0 1px;">  
+          <img src="./data/elephant.jpg" style="width: 70%; height: auto">
+          <p>Elephant Picture (High Frequency Image)</p>
+      </div>
+      <div style="text-align: center; margin: 0 1px;">  
+        <img src="./data/elephant_mix.png" style="width: 100%; height: auto">
+        <p>Elephants??? (Failed) (Low &#963; = 5, High &#963; = 10)</p>
+    </div>
+  </div>
+
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
+    I thought it would've been cool to see a clip art from a far and a real elephant up close. It looks okay, but not as good as the Sharksub. I believe it failed because the elephants weren't in similar orientation.
+    So, I realized that for a hybrid image to look great, both images need to be in a relatively similar orientation.
+  </p>
+
+
+  <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+    <div style="text-align: center; margin: 0 1px;">
+        <img src="./data/dumbledore.jpg" style="width: 70%; height: auto">
+        <p>Dumbledore (Low Frequency Image)</p>
+    </div>
+    <div style="text-align: center; margin: 0 1px;">  
+        <img src="./data/gandalf.jpg" style="width: 70%; height: auto">
+        <p>Gandalf (High Frequency Image)</p>
+    </div>
+    <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/dumbledalf.png" style="width: 70%; height: auto">
+      <p>Dumbledalf (Low &#963; = 3.5, High &#963; = 4)</p>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 10px;">
+      <img src="./data/dumbledore_amp.png" style="width: 100%; height: auto">
+      <p>Dumbledore</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+      <img src="./data/dumbledore_low.png" style="width: 100%; height: auto">
+      <p>Dumbledore (Low Frequency)</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/gandalf_amp.png" style="width: 100%; height: auto">
+    <p>Gandalf</p>
+</div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/gandalf_high.png" style="width: 100%; height: auto">
+    <p>Gandalf (High Frequency)</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/dumbledalf_amp.png" style="width: 100%; height: auto">
+    <p>Dumbledalf (Hybrid)</p>
+</div>
+</div>
+      
+<p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> Since all signals can be decomposed into a sum of sine waves, we can map the amplitudes of each frequency. We end up getting an 
+  amplitude spectrum. Above is the different amplitude spectrums for the Dumbledalf images.
+</p>
+
+
+<div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 1px;">
+      <img src="./data/dumbledalf.png" style="width: 70%; height: auto">
+      <p>Both Frequencies Grayscale</p>
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/dumbledalf_color_low.jpg" style="width: 70%; height: auto">
+      <p> Only Low Frequency Colored</p>
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+    <img src="./data/dumbledalf_color_high.jpg" style="width: 70%; height: auto">
+    <p>Only High Frequency Colored</p>
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+  <img src="./data/dumbledalf_color_both.jpg" style="width: 70%; height: auto">
+  <p>High and Low Frequency Colored</p>
+</div>
+</div>
+<p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
+  We can add color to emphasize the high frequency, the low frequency, or both! I kept the high and low sigmas the same to see what only color does to the hybrid image. The low frequencie colors
+  really emphasize the general color of the image and the high frequencies gives more emphasis on small details. For example, the picture with only the high frequency colored makes some of Gandalf's facial
+  features more noticable. However, I believe have both frequencies colored gives the best effect.
+</p>
+
+  
+    </div>
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+      <h4 style="margin-left: 240px; font-weight: bold;">Multi-resolution Blending and the Oraple Journey</h4>
+      <h4 style="margin-left: 240px; font-weight: bold;">Part 2.3: Gaussian and Laplacian Stacks</h4>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+
+          In image blending using Gaussian and Laplacian stacks, we create blurred versions of the images to isolate low-frequency and high-frequency components. 
+          A <strong>Gaussian stack</strong> consists of several levels of progressively blurred images, capturing the overall structure and low-frequency information. In contrast, 
+          a <strong>Laplacian stack</strong> is generated by calculating the difference between consecutive levels of the Gaussian stack, which retains the high-frequency 
+          details essential for edge detection. The blending is performed by combining these stacks with a mask that controls the contribution of each image at various levels. 
+          The blending equation can be expressed as:
+        </p>
+        
+        <p style="text-align: center;">
+          <strong>Blended_Image(i) = Mask(i) × Image_A(i) + (1 - Mask(i)) × Image_B(i)</strong>
+        </p>
+      
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
+          Here, <strong>Blended_Image(i)</strong> is formed by blending the images at each level <em>i</em>, using the respective mask to control 
+          the blending proportion. This method effectively merges the low-frequency components from one image with the high-frequency details 
+          from another, resulting in a seamless transition between the two.
+
+      </p>
+
+      <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 1px;">
+            <img src="./data/apple_gauss.png" style="width: 71%; height: auto">
+            <p>Apple Gaussian Stack</p>
+        </div>
+      </div>
+        <div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;"></div>
+        <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data/apple_lapla.png" style="width: 50%; height: auto">
+            <p>Apple Laplacian Stack</p>
+        </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;"></div>
+        <div style="text-align: center; margin: 0 1px;">  
+          <img src="./data/orange_guass.png" style="width: 50%; height: auto">
+          <p>Orange Guassian Stack</p>
+      </div>
+      </div>
+      <div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;"></div>
+      <div style="text-align: center; margin: 0 1px;">  
+        <img src="./data/orange_lapla.png" style="width: 50%; height: auto">
+        <p>Orange Laplacian Stack</p>
+    </div>
+    </div>
+
+
+
+    <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+      <div style="text-align: center; margin: 0 1px;">
+          <img src="./data/apple_0.png" style="width: 71%; height: auto">
+      </div>
+      <div style="text-align: center; margin: 0 1px;">  
+          <img src="./data/orange_0.png" style="width: 71%; height: auto">
+          <p>Level 0 of Laplacian Stack</p>
+      </div>
+      <div style="text-align: center; margin: 0 1px;">  
+        <img src="./data/orple0.png" style="width: 71%; height: auto">
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+    <div style="text-align: center; margin: 0 1px;">
+        <img src="./data/apple_2.png" style="width: 71%; height: auto">
+    </div>
+    <div style="text-align: center; margin: 0 1px;">  
+        <img src="./data/orange_2.png" style="width: 71%; height: auto">
+        <p>Level 2 of Laplacian Stack</p>
+    </div>
+    <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/orple2.png" style="width: 71%; height: auto">
+  </div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 1px;">
+      <img src="./data/apple_4.png" style="width: 71%; height: auto">
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/orange_4.png" style="width: 71%; height: auto">
+      <p>Level 4 of Laplacian Stack</p>
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+    <img src="./data/orple4.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 1px;">
+      <img src="./data/final_apple.png" style="width: 71%; height: auto">
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/final_orange.png" style="width: 71%; height: auto">
+      <p>Collapsed</p>
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+    <img src="./data/final_orple.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 10px;">
+    <img src="./data/horizon.jpg" style="width: 100%; height: auto">
+    <p>Horizon</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/galaxy.jpg" style="width: 100%; height: auto">
+    <p>Galaxy</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+  <img src="./data/horizontal_mask.png" style="width: 100%; height: auto">
+  <p>Mask</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/final_galaxy_horizon.png" style="width: 100%; height: auto">
+    <p>Galaxy Horizon</p>
+    </div>
+  </div>
+
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
+    While playing around with the parameters for the galaxy and horizon pictures, I learned that having a very high mask sigma isn't always good because the edges will "bleed" into the other
+  picture. It wasn't a natural transition. So, I lowered the blurring affect of the mask Guassian stack so there is more of harsh transition, which works here because the transition of a horizon usually
+  harsh.
+  </p>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+<div style="text-align: center; margin: 0 10px;">
+    <img src="./data/claude.jpg" style="width: 100%; height: auto">
+    <p>Claude the Alligator</p>
+</div>
+<div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/campus.jpg" style="width: 100%; height: auto">
+    <p>Campus</p>
+</div>
+<div style="text-align: center; margin: 0 10px;">  
+  <img src="./data/claude_mask.jpg" style="width: 100%; height: auto">
+  <p>Mask</p>
+</div>
+<div style="text-align: center; margin: 0 10px;">  
+  <img src="./data/final_claude_campus.png" style="width: 100%; height: auto">
+  <p>Claude going to class</p>
+</div>
+</div>
+
+
+<div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 1px;">
+      <img src="./data/claude_0.png" style="width: 71%; height: auto">
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+      <img src="./data/campus_0.png" style="width: 71%; height: auto">
+      <p>Level 0 of Laplacian Stack</p>
+  </div>
+  <div style="text-align: center; margin: 0 1px;">  
+    <img src="./data/claude_campus0.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+<div style="text-align: center; margin: 0 1px;">
+    <img src="./data/claude_2.png" style="width: 71%; height: auto">
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+    <img src="./data/campus_2.png" style="width: 71%; height: auto">
+    <p>Level 2 of Laplacian Stack</p>
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+  <img src="./data/claude_campus2.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+<div style="text-align: center; margin: 0 1px;">
+  <img src="./data/claude_4.png" style="width: 71%; height: auto">
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+  <img src="./data/campus_4.png" style="width: 71%; height: auto">
+  <p>Level 4 of Laplacian Stack</p>
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+<img src="./data/claude_campus4.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; margin-top: 0px; margin-left: 240px; margin-right: 240px;">
+<div style="text-align: center; margin: 0 1px;">
+  <img src="./data/final_claude.png" style="width: 71%; height: auto">
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+  <img src="./data/final_campus.png" style="width: 71%; height: auto">
+  <p>Collapsed</p>
+</div>
+<div style="text-align: center; margin: 0 1px;">  
+<img src="./data/final_claude_campus.png" style="width: 71%; height: auto">
+</div>
+</div>
+
+
+<p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
+  This is a case where the blending didn't work out as well as I'd thought. I ran same process that produced the images above but we can see that
+  it didn't 
+</p>
+
+<div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+  <div style="text-align: center; margin: 0 10px;">
+    <img src="./data/cereal.jpg" style="width: 100%; height: auto">
+    <p>Cereal</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/soup1.jpg" style="width: 100%; height: auto">
+    <p>Soup</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+  <img src="./data/vertical_mask.png" style="width: 80%; height: auto">
+  <p>Mask</p>
+  </div>
+  <div style="text-align: center; margin: 0 10px;">  
+    <img src="./data/final_cerealsoupe.png" style="width: 100%; height: auto">
+    <p>Cereal is not a soup (Failed Blending)</p>
+    </div>
+  </div>
+
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
+    Here is a blending fail I came across. I thought it would combine cleanly but even with very high blurring of the mask it didn't work so well. I believe it doesn't look
+    as great as the others because the bowls don't line up. Sadly, image blending isn't totally plug and play. It does require a little of transformation of the photos in order 
+    for it to look seamless.
+  </p>
+    
+
+</div>
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+  <p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
+    <strong> Conclusion: </strong> I learned a lot from this project. I learned how to think of images as frequencies and by doing so we are able to apply various filters that allow us to
+    manipulate images in interesting ways. By experimenting I also gained insights on the draw backs of some of these methods. It got me thinking on ways to improve and build upon some of the
+    method introduced in this report.
+    </p>
+  <!--end-->  
+  <div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
+  
+</body>
+</html>
