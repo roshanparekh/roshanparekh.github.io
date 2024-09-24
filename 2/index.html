@@ -116,7 +116,7 @@
     </div>
 
     <p style="margin-left: 240px; margin-right: 240px; margin-top: 10px">
-      <b>Reflection:</b> After the smoothening the image, the edges have become more distinct. The noise has also
+      <b>Reflection:</b> After smoothening the image, the edges have become more distinct. The noise has also
       decreased.
     </p>
 
@@ -155,7 +155,7 @@
       <h4 style="margin-left: 240px; font-weight: bold;">Part 2.1: Image "Sharpening"</h4>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
           We are able to sharpen images by adding some of the higher frequencies back to the image. This is achieved by doing a low-pass filter on the original image
-          then subtracting it from original image. This leaves us with an image with high frequencies then we can add this back to the original image. We can also multiply the
+          then subtracting it from original image. This leaves us with an image with high frequencies that we can add back to the original image. We can also multiply the
           high frequency image by a scaler (alpha) to sharpen the image further.
 
       </p>
@@ -236,9 +236,10 @@
 </div>
 
 <p style="margin-left: 240px; margin-right: 240px; margin-top: 10px">
-  A picture of a train from my phone's camera was already sharp, and after blurring it, and sharpening that blurred image didn't really affect it.
-  If you look closely, some of the writing on the train got sharper but it is very subtle. The original image is the sharpest because sharpening
-  can't restore lost data.
+  A picture of a train from my phone's camera was already sharp. After blurring it, and sharpening that blurred image, the image didn't see any drastic change. This may have been because of a low alpha or low sigma. I tried to see if that
+  was the case, but it took too long to run on my computer, so I wasn't able to test it.
+  If you look closely, some of the writing on the train got sharper, but it is very subtle. The original image still looks better because sharpening
+  can't restore the loss of detail from the blurring.
 </p>
 </div>
 
@@ -249,12 +250,12 @@
   <div style="margin-top: 40px;">
         <h4 style="margin-left: 240px; font-weight: bold;">Part 2.2: Hybrid Images</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-          We can create images that look different up close and further away; they are called hybrid images. This is done by keeping the higher frequencies of one image 
-          and the lower frequencies of another. The higher frequency image is seen up close and the lower frequency image is seen from further away.
+          We can create images that look different up close and farther away; they are called hybrid images. This is done by keeping the higher frequencies of one image 
+          and the lower frequencies of another. The higher frequency image is seen up close and the lower frequency image is seen from farther away.
           <br>
           <br>
           I followed the approach outlined in a paper called Hybrid Images by Oliva, Torrabla, and Schyns.
-          The approach was to low-pass filter the image I want to be seen further away and high-pass filter the other, and added the images. The low-pass filter was a standard
+          The approach was to low-pass filter the image you want to be seen farther away and high-pass filter the other, and then add the images. The low-pass filter was a standard
           Gaussian blur, and the high-pass filter was subtracting the Gaussian-filtered image from the original image.
           <br>
           <br>
@@ -310,7 +311,7 @@
   </div>
 
   <p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
-    I thought it would've been cool to see a clip art from a far and a real elephant up close. It looks okay, but not as good as the Sharksub. I believe it failed because the elephants weren't in similar orientation.
+    I thought it would've been cool to see a clip art from afar and a real elephant up close. It looks okay, but not as good as the Sharksub. I believe it failed because the elephants weren't in a similar orientation.
     So, I realized that for a hybrid image to look great, both images need to be in a relatively similar orientation.
   </p>
 
@@ -377,9 +378,9 @@
 </div>
 </div>
 <p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
-  We can add color to emphasize the high frequency, the low frequency, or both! I kept the high and low sigmas the same to see what only color does to the hybrid image. The low frequencie colors
-  really emphasize the general color of the image and the high frequencies gives more emphasis on small details. For example, the picture with only the high frequency colored makes some of Gandalf's facial
-  features more noticable. However, I believe have both frequencies colored gives the best effect.
+  We can add color to emphasize the high frequency, the low frequency, or both! I kept the high and low sigmas the same to see what only color does to the hybrid image. The low frequency colors
+  really emphasize the general color of the image, and the high frequencies give more emphasis on small details. For example, the picture with only the high frequency colored makes some of Gandalf's facial
+  features more noticable. However, I believe having both frequencies colored gives the best effect.
 </p>
 
   
@@ -398,12 +399,12 @@
         </p>
         
         <p style="text-align: center;">
-          <strong>Blended_Image(i) = Mask(i) × Image_A(i) + (1 - Mask(i)) × Image_B(i)</strong>
+          <strong>Blended_Image(k) = Mask(k) × Image_A(k) + (1 - Mask(k)) × Image_B(k)</strong>
         </p>
       
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
-          Here, <strong>Blended_Image(i)</strong> is formed by blending the images at each level <em>i</em>, using the respective mask to control 
-          the blending proportion. This method effectively merges the low-frequency components from one image with the high-frequency details 
+          Here, <strong>Blended_Image(k)</strong> is formed by blending the images at each level <em>k</em>, using the respective mask to control 
+          the blending amount. This method effectively merges the low-frequency components from one image with the high-frequency details 
           from another, resulting in a seamless transition between the two.
 
       </p>
@@ -508,7 +509,7 @@
 
   <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
     While playing around with the parameters for the galaxy and horizon pictures, I learned that having a very high mask sigma isn't always good because the edges will "bleed" into the other
-  picture. It wasn't a natural transition. So, I lowered the blurring affect of the mask Guassian stack so there is more of harsh transition, which works here because the transition of a horizon usually
+  picture. It wasn't a natural transition. So, I lowered the blurring effect of the mask's Guassian stack so there is more of harsh transition; it works here since the transition of a horizon is usually
   harsh.
   </p>
 
@@ -584,12 +585,6 @@
 </div>
 </div>
 
-
-<p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
-  This is a case where the blending didn't work out as well as I'd thought. I ran same process that produced the images above but we can see that
-  it didn't 
-</p>
-
 <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
   <div style="text-align: center; margin: 0 10px;">
     <img src="./data/cereal.jpg" style="width: 100%; height: auto">
@@ -610,8 +605,8 @@
   </div>
 
   <p style="margin-left: 240px; margin-right: 240px; margin-top: 0px">
-    Here is a blending fail I came across. I thought it would combine cleanly but even with very high blurring of the mask it didn't work so well. I believe it doesn't look
-    as great as the others because the bowls don't line up. Sadly, image blending isn't totally plug and play. It does require a little of transformation of the photos in order 
+    Above is a blending fail I came across. I thought it would combine seamlessly but even with very high blurring of the mask it didn't work so well. I believe it doesn't look
+    as great as the others because the bowls don't line up. Sadly, image blending isn't totally a plug-and-play process. It does require a little transformation of the photos in order 
     for it to look seamless.
   </p>
     
@@ -620,8 +615,8 @@
   <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
   <p style="margin-left: 240px; margin-right: 240px; margin-top: 1px"> 
     <strong> Conclusion: </strong> I learned a lot from this project. I learned how to think of images as frequencies and by doing so we are able to apply various filters that allow us to
-    manipulate images in interesting ways. By experimenting I also gained insights on the draw backs of some of these methods. It got me thinking on ways to improve and build upon some of the
-    method introduced in this report.
+    manipulate images in various interesting ways. By experimenting, I also gained insights on the drawbacks of some of these methods. It got me thinking on ways to improve and build upon some of the
+    methods introduced in this report.
     </p>
   <!--end-->  
   <div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
