@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+  <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Project 3: Face Morphing</h1>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+  <div style="margin-top: 50px;">
+    <div style="margin-left: 240px;margin-right: 240px; display: flex; justify-content: center; align-items: center;">
+      <img src="./data/im_dog_binary.png" style="width: 24%; height: auto; margin-right: 10px;">
+      <img src="./data/taj_alpha3.png" style="width: 24%; height: auto; margin-left: 10px;">
+      <img src="./data/final_orple.png" style="width: 24%; height: auto; margin-left: 10px;">
+    </div>
+</div>
+<hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 1: Defining Correspondences</h3>
+  
+  <div style="margin-top: 20px;">
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        Started with manually creating correspondences using a small ginput tool I wrote. The corresponding points will be used to create a triangular
+        mesh, which will be used in the morphing process. I created the triangular mesh using Delaunay triangulation.
+      </p>
+
+      <div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 3px;"> 
+            <img src="./data_out/roshan_triangulation.png" style="width: 100%; height: auto">
+            <p>Roshan Keypoints & Triangulation</p>
+        </div>
+        <div style="text-align: center; margin: 0 3px;">
+            <img src="./data_out/george_triangulation.png" style="width: 100%; height: auto">
+            <p>George Keypoints & Triangulation</p>
+        </div>
+    </div>    
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 2: Computing the "Mid-way Face"</h3>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          To compute the mid-way face, we follow three steps:
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;1. Compute the average shape by taking the average of each correspondence points
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;2. Warp the original faces to the average shape
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;3. Cross-dissolve the two images to average the colors
+          <br><br>
+      </p>
+
+      <div style="margin-top: 20px;"></div>
+        <h4 style="margin-left: 240px; font-weight: bold;">Image Warping</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+          To warp a face into another shape, I iterated through each 
+          corresponding triangle on both images and computed its affine matrix, which transformations
+          the points in the source image to the points in the target image.
+          <br>
+          Since we are inverse warping, I calculated the original position of the pixels by multiplying the points
+          in the each triangle by the inverse of the affine matrix and interpolated the color using nearest neighbor interpolation.
+        </p>
+  
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+          <div style="text-align: center; margin: 0 1px;">
+              <img src="./data_out/roshan_plt.png" style="width: 88%; height: auto">
+              <p>Me (Unwarped)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+              <img src="./data_out/roshan_george_midway.png" style="width: 100%; height: auto">
+              <p>Roshan & George Midway Face</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data_out/george.png" style="width: 88%; height: auto">
+            <p>George (Unwarped)</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        <div style="text-align: center; margin: 0 1px;">
+            <img src="./data_out/roshan_plt.png" style="width: 88%; height: auto">
+            <p>Me (Unwarped)</p>
+        </div>
+        <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data_out/roshan_warped.png" style="width: 100%; height: auto">
+            <p>Me (Warped to average shape)</p>
+        </div>
+        <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data_out/george.png" style="width: 88%; height: auto">
+            <p>George (Unwarped)</p>
+        </div>
+        <div style="text-align: center; margin: 0 1px;">  
+          <img src="./data_out/george_warped.png" style="width: 100%; height: auto">
+          <p>George (Warped to average shape)</p>
+      </div>
+    </div>
+</div>
+
+<div style="margin-top: 10px;">  
+        <div style="margin-top: 20px;"></div>
+          <h4 style="margin-left: 240px; font-weight: bold;">Cross-Dissolve</h4>
+          <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            The second part of warping is to cross-dissolve the two photos so then blend in together.
+            <br>
+            There are many metrics that can be used to select how much to cross-dissolve the images by, but I stuck with
+            a simple linear interpolation. In other words, I averaged the two pictures.
+          </p>
+    
+          <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_out/roshan_plt.png" style="width: 88%; height: auto">
+                <p>Me (Unwarped)</p>
+            </div>
+            <div style="text-align: center; margin: 0 1px;">  
+                <img src="./data_out/roshan_george_midway.png" style="width: 100%; height: auto">
+                <p>Roshan & George Mid-way Face</p>
+            </div>
+            <div style="text-align: center; margin: 0 1px;">  
+              <img src="./data_out/george.png" style="width: 88%; height: auto">
+              <p>George (Unwarped)</p>
+          </div>
+        </div>
+  
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+          <div style="text-align: center; margin: 0 1px;">
+              <img src="./data_out/roshan_plt.png" style="width: 88%; height: auto">
+              <p>Me (Unwarped)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+              <img src="./data_out/roshan_warped.png" style="width: 100%; height: auto">
+              <p>Me (Warped to average shape)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+              <img src="./data_out/george.png" style="width: 88%; height: auto">
+              <p>George (Unwarped)</p>
+          </div>
+          <div style="text-align: center; margin: 0 1px;">  
+            <img src="./data_out/george_warped.png" style="width: 100%; height: auto">
+            <p>George (Warped to average shape)</p>
+        </div>
+      </div>
+  </div>
+    
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 3: The "Morph" Sequence</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            By repeating the process in part 2 for values in the range from [0,1], we can create a morph sequence.
+            <br>
+            The weights on how much to morph and cross-dissolve depend where we are in the sequence.
+            <br>
+            Following is a 46 frame morph sequence at 30fps.
+        </p>
+  
+        <div style="margin-top: 20px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_out/morph_sequence.gif" style="width: 70%; height: auto">
+                </div>
+            </div>
+        </div>  
+        <div style="margin-top: 20px;">
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_out/morph_sequence_noncorners.gif" style="width: 70%; height: auto">
+                    <p> Here is a morph sequence without adding the corners, so all we see is the face morphing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 4: The "Mean Face" of a Population</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            By looking at a large population we can extract the average and see what is common amoungst the whole population.
+            <br>
+            Here I am using the annotated faces from the FEI Face Database. 
+            <br>
+            I am running the same morphing process as outlined above.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/neutral_average_face.png" style="width: 100%; height: auto">
+                <p>Average face after morphing <br> Neutral Expression Population</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/neutral_population_average_face_shape.png" style="width: 80%; height: auto">
+                <p>Average face shape</p>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/5a.jpg" style="width: 100%; height: auto">
+                <p>5a normal</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/23a.jpg" style="width: 100%; height: auto">
+                <p>23a normal</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/24a.jpg" style="width: 100%; height: auto">
+                <p>24a normal</p>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/population_5_morph_avg.png" style="width: 100%; height: auto">
+                <p>5a morphed to average</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/population_23_morph_avg.png" style="width: 100%; height: auto">
+                <p>23a morphed to average</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/population_24_morph_avg.png" style="width: 100%; height: auto">
+                <p>24a morphed to average</p>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/roshan_to_avg.png" style="width: 100%; height: auto">
+                <p>My face to average geometry</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/avg_to_roshan.png" style="width: 100%; height: auto">
+                <p>Average to my geometry</p>
+            </div>        
+        </div>
+        <p style="text-align: center; margin-left: 240px; margin-right: 240px;"> 
+            The reason I look like bulbous and skewed is probably due to external factors such as distance from camera.
+            For instance, the average face is almost entirely in the frame; in contrast, my original picture has lot more background.
+            So, my face will get stretched to fit the frame, and the average face will get squeezed to get more background.
+        </p>
+        
+
+    </div>
+
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Part 5: Caricatures: Extrapolating from the mean</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            By using the mean face calculated in the previous part, I created caricatures of my face.
+            <br>
+            The target correspondences were extrapolated with the equation: 
+            <strong>(1 - &alpha;)(my_face) + &alpha; (average_face) </strong>
+            <br>
+            When <strong>&alpha; &lt; 0</strong>, it emphasizes my features. When <strong>&alpha; &gt; 0</strong>, it emphasizes the average face's features
+
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/roshan_squeeze.png" style="width: 100%; height: auto">
+                <p>&alpha; = -0.8</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/roshan_stretch.png" style="width: 100%; height: auto">
+                <p>&alpha; = 1.8</p>
+            </div>
+        </div>
+    </div>
+
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Bells & Whistles</h3>
+        <h4 style="margin-left: 240px; font-weight: bold;">Demographic Change</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            With face morphing, we can change the shape and appeareance of a person. Here I changed my a picture of myself to look like the average Samoan female.
+            <br>
+            
+
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/roshan_bellswhistle.jpg" style="width: 100%; height: auto">
+                <p>Me</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/averagesamoanfemale.jpg" style="width: 100%; height: auto">
+                <p>Average Samoan Female</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/roshan_shape_change.png" style="width: 100%; height: auto">
+                <p>Shape Change Only <br> (warp_frac = 0.5)</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/roshan_color_change.png" style="width: 100%; height: auto">
+                <p> Apperance Change Only <br> (dissolve_frac = 0.5)</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/roshan_both_change.png" style="width: 100%; height: auto">
+                <p> Shape & Apperance Change <br> (warp_frac & dissolve_frac = 0.5)</p>
+            </div>            
+        </div>        
+    </div>
+</div>  
+<div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
+  
+</body>
+</html>
