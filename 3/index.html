@@ -41,7 +41,7 @@
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
           To compute the mid-way face, we follow three steps:
           <br>
-          &nbsp;&nbsp;&nbsp;&nbsp;1. Compute the average shape by taking the average of each correspondence points
+          &nbsp;&nbsp;&nbsp;&nbsp;1. Compute the average shape by taking the average of each correspondence point
           <br>
           &nbsp;&nbsp;&nbsp;&nbsp;2. Warp the original faces to the average shape
           <br>
@@ -53,11 +53,11 @@
         <h4 style="margin-left: 240px; font-weight: bold;">Image Warping</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
           To warp a face into another shape, I iterated through each 
-          corresponding triangle on both images and computed its affine matrix, which transformations
+          corresponding triangle on both images and computed its affine matrix, which transforms
           the points in the source image to the points in the target image.
           <br>
           Since we are inverse warping, I calculated the original position of the pixels by multiplying the points
-          in the each triangle by the inverse of the affine matrix and interpolated the color using nearest neighbor interpolation.
+          in each triangle by the inverse of the affine matrix and interpolated the color using nearest neighbor interpolation.
         </p>
   
         <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
@@ -99,7 +99,7 @@
         <div style="margin-top: 20px;"></div>
           <h4 style="margin-left: 240px; font-weight: bold;">Cross-Dissolve</h4>
           <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-            The second part of warping is to cross-dissolve the two photos so then blend in together.
+            The second part of warping is to cross-dissolve the two photos so they blend in together.
             <br>
             There are many metrics that can be used to select how much to cross-dissolve the images by, but I stuck with
             a simple linear interpolation. In other words, I averaged the two pictures.
@@ -293,11 +293,11 @@
             </div>
             <div style="text-align: center; margin: 0 10px;">  
                 <img src="./data_out/roshan_color_change.png" style="width: 100%; height: auto">
-                <p> Apperance Change Only <br> (dissolve_frac = 0.5)</p>
+                <p> Appearance Change Only <br> (dissolve_frac = 0.5)</p>
             </div>
             <div style="text-align: center; margin: 0 10px;">  
                 <img src="./data_out/roshan_both_change.png" style="width: 100%; height: auto">
-                <p> Shape & Apperance Change <br> (warp_frac & dissolve_frac = 0.5)</p>
+                <p> Shape & Appearance Change <br> (warp_frac & dissolve_frac = 0.5)</p>
             </div>            
         </div>        
     </div>
