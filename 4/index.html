@@ -31,7 +31,7 @@
   
   <div style="margin-top: 20px;">
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-        I took the pictures in this report with an iPhone 13 Pro. I used AF/AE lock to limit lighting changes in order to make a seamless transitiion between
+        I took the pictures in this report with an iPhone 13 Pro. I used AF/AE lock to limit lighting changes in order to make a seamless transition between
         photos of a moasic. However, for the Ghirardelli picture, I intentially wanted to see how would a lighting difference look in a mosaic. 
     </p>
     </div>
@@ -129,7 +129,7 @@
     <div style="margin-top: 40px;">
         <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Blending the Images into a Mosaic</h3>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-           I began by plotting more than 4 corresponding points, so I can do error minimization of least squares.
+           I began by plotting more than 4 corresponding points, so I can do error minimization using least squares.
            From there I warped the image to the picture I wanted to stay fixed. I was then able to calculate the bounding box for the
            mosaic using the offsets from the warp. I also created binary masks of each image with respect to the mosaic space.
            To create more of a seamless transition, I did a distance transform on the masks. I used the distance transform to find
