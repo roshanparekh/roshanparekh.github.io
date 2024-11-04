@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+  <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Project 4: (Auto)Stitching of Photo Mosaics</h1>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+<hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Introduction</h3>
+  
+  <div style="margin-top: 20px;">
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        In this project, I explored how to perform image recitification, and create panoramas by stitching photos together, both manually and automatically.
+      </p>
+    </div>    
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Recover Homographies</h3>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+
+        To recover the homography that will be used to warp the entire image, I began by plotting corresponding points between the images in question. These correspsonding points
+        denoted key features that are shared between the images.
+
+        <br>
+        <br>
+        Homographies can be defined by 8 points, or 4 pairs of correspondences. However, we can use more than 4 pairs of correspondences to solve for the homography by using least squares.
+        Least squares minimizes the error that is caused by slightly misaligned correspondences; thus, giving us a better solution.
+
+        <br>
+        <br>
+        The following is how I mathematically calculated the homography.
+
+        \[ \begin{bmatrix} x_1 & y_1 & 1 & 0
+        & 0 & 0 & -x'_1 x_1 & -x'_1 y_1 \\
+        0 & 0 & 0 & x_1 & y_1 & 1 & -y'_1 x_1 &
+        -y'_1 y_1 \\
+        x_2 & y_2 & 1 & 0 & 0 & 0 & -x'_2 x_2 &
+        -x'_2 y_2 \\
+        0 & 0 & 0 & x_2 & y_2 & 1 & -y'_2 x_2 &
+        -y'_2 y_2 \\ & & & &  \vdots\end{bmatrix}
+        \begin{bmatrix} a \\ b \\ c \\ d \\ e \\ f \\ g \\ h
+        \end{bmatrix} =
+        \begin{bmatrix}
+        x'_1 \\ y'_1 \\ x'_2 \\ y'_2 \\ \vdots
+        \end{bmatrix}
+        \]
+        <br>
+        Using least squares yield us the variables a through h. Allowing us to get to the following:
+        <br>
+        \[
+        H = \begin{bmatrix} a & b &
+            c \\ d & e & f \\ g & h & 1
+            \end{bmatrix}
+        \]
+
+        <br>
+        Now we can use the recovered homography, and warp the entire image.
+        <br>
+        \[
+        \begin{bmatrix} x' \\ y' \\ w
+        \end{bmatrix} = \begin{bmatrix} h_1 & h_2 & h_3 \\ h_4 & h_5
+        & h_6 \\ h_7 & h_8 & 1 \end{bmatrix} \begin{bmatrix} x \\ y
+        \\ 1 \end{bmatrix}
+        \]
+
+        <br>
+        It is important to note to divide the result by w to recover
+        the transformed coordinates.
+        <br>
+      </p>
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Image Rectification</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            An applicaton of applying homographies, or tranforming an image with a perspective warp, is to rectify an image, which has wide use throughout computer vision
+            and photography, such as creating panoramas.
+        </p>
+  
+        <div style="margin-top: 20px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_in/keyboard.jpeg" style="width: 100%; height: auto">
+                </div>
+
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_out/keyboard_rectifed.jpg" style="width: 78%; height: auto">
+                </div>
+            </div>
+        </div>  
+
+        <div style="margin-top: 20px;">
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_in/tapestry.jpg" style="width: 100%; height: auto">
+                </div>
+                <div style="text-align: center; margin: 0 1px;">
+                    <img src="./data_out/tapestry_rectifed.jpg" style="width: 80%; height: auto">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Blending the Images into a Mosaic</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+           I began by plotting more than 4 corresponding points, so I can the error minimization of least squares.
+           From there I warped the image to the I wanted to stay fixed. I was then able to calculate the bounding box for the
+           mosaic using the offsets from the warp. I also created binary masks of each image with respect to the mosaic space.
+           To create more of seamless transition, I did a distance transform on the masks. I used the distance transform to find
+           the alpha mask, which I then used to blend the images using a Laplacian stack.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/backyardA.jpeg" style="width: 100%; height: auto">
+                <p>Image to warp</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_in/backyardB.jpeg" style="width: 100%; height: auto">
+                <p>Fixed Image</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_panoA.jpg" style="width: 100%; height: auto">
+                <p>Warped Image in Mosaic Space</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_panoB.jpg" style="width: 100%; height: auto">
+                <p>Fixed Image in Mosaic Space</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_mask_A.png" style="width: 100%; height: auto">
+                <p>Warped Image Mask</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_mask_B.png" style="width: 100%; height: auto">
+                <p>Fixed Image Mask</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_bwdist_A.png" style="width: 100%; height: auto">
+                <p>Distance Transform of Warped Image Mask</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_bwdist_B.png" style="width: 100%; height: auto">
+                <p>Distance Transform of Fixed Image Mask</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_alphamask.png" style="width: 100%; height: auto">
+                <p>Alpha Mask</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_pano.jpg" style="width: 100%; height: auto">
+                <p>Final Result</p>
+            </div>
+        </div>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">Final Results of Manual Panoramic Creation</h4>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/steamA.jpeg" style="width: 100%; height: auto">
+                <p>Left</p>
+                </div>
+                <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/steamB.jpeg" style="width: 100%; height: auto">
+                <p>Right</p>
+                </div>  
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <div style="text-align: center; margin: 0 10px;">
+                    <img src="./data_out/steam_pano.jpg" style="width: 100%; height: auto">
+                    <p>Final <br> There is a little misalignment as seen on wall of the building and in the steam </p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/ghirardelliA.jpg" style="width: 100%; height: auto">
+                <p>Left</p>
+                </div>
+                <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/ghirardelliB.jpg" style="width: 100%; height: auto">
+                <p>Right</p>
+                </div>  
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <div style="text-align: center; margin: 0 10px;">
+                    <img src="./data_out/ghirardelli_pano.jpg" style="width: 100%; height: auto">
+                    <p>Final <br> There is a strong seamline possibly due to the lighting. The difference in color can be seen in the roof of the building 
+                    <br> This is even with 4 layers and a sigma of 5 for blending.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/backyardA.jpeg" style="width: 100%; height: auto">
+                <p>Left</p>
+                </div>
+                <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_in/backyardB.jpeg" style="width: 100%; height: auto">
+                <p>Right</p>
+                </div>  
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <div style="text-align: center; margin: 0 10px;">
+                    <img src="./data_out/backyard_pano.jpg" style="width: 100%; height: auto">
+                    <p>Final </p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Feature Matching for Autostitching</h3>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            Instead of manually finding correspondences, we can save time and greatly minimize error by implementing autostitching. <br><br>
+            I followed the method outlined in <b>Multi-Image Matching using Multi-Scale Oriented Patches by Brown, Szeliski, and Winder</b> coupled
+            with <b>4-point RANSAC <br>(RANdom SAmple Concensus)</b>.
+        </p>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">1. Harris Interest Point Dectector</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            First, I found the Harris corners. These are list of potential "corners" in the image. A corner in this case are windows of pixels that change
+            whenever there translation in x or y.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_harris_strength_A.png" style="width: 100%; height: auto">
+                <p>Harris Corner Strength Map (Image A)</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_harris_A.png" style="width: 100%; height: auto">
+                <p>All Possible Harris Corners (Image A)</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_harris_strength_B.png" style="width: 100%; height: auto">
+                <p>Harris Corner Strength Map (Image B)</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_harris_B.png" style="width: 100%; height: auto">
+                <p>All Possible Harris Corners (Image B)</p>
+            </div>
+        </div>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">2. Adaptive Non-Maximal Suppression</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            There are too many corners to compute a homography on and many of them aren't correspondences, so it wouldn't help even if we were to recover the homography
+            with all those corners. So, we must reduce the amount of corners to those that are represent strong corners using the Harris corner strength map. 
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_anms_A.png" style="width: 100%; height: auto">
+                <p>After applying ANMS on Image A</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_anms_B.png" style="width: 100%; height: auto">
+                <p>After applying ANMS on Image B</p>
+            </div>
+        </div>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">3. Feature Descriptor Extraction</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We have reduced the amount of corners to check. Now we must find corresponding features between the images, so we can recover our homography. In order to do that,
+            we must first extract those features and compare them.
+            <br>
+            The process to examine the features from the corners is to first extract a 40x40 descriptor/ or patch around each Harris corner left by AMNS, and then downsample them.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_patches_A.png" style="width: 100%; height: auto">
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_patches_B.png" style="width: 100%; height: auto">
+            </div>
+        </div>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">5. Feature Matching</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We need to now see which features are the best matches. To do this, I computed the first and second nearest-neighbor of each feature descriptor, and then
+            divide the 1-NN by the 2-NN. If this ratio is within a threshold, then they are good corresponding pairs.
+            <br>
+            Here are the locations of the corresponding features. We can see that there are some outliers; we need to take care of them before we can recover the
+            homography.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_filtered_features_A.png" style="width: 100%; height: auto">
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_filtered_features_B.png" style="width: 100%; height: auto">
+            </div>
+        </div>
+
+        <h4 style="margin-left: 240px; font-weight: bold;">6. 4-Point RANSAC (Robust Homography Estimate)</h4>
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+           To filter out the outliers, we can use RANSAC which stands for <b>RAN</b>dom <b>SA</b>mple <b>C</b>oncensus. We essentially random sample 4 points,
+           compute the homography, and see how many of the points we were left with after feature matching are inliers. We choose the 4 points that
+           gave us the most inliers.
+           <br>
+           <br>
+            RANSAC Loop:<br>
+            - Select 4 feature points at random<br>
+            - Compute Homography <br>
+            - Compute inliners where dist(p', Hp') &lt; tol <br>
+            - Keep the largest set of inliners <br>
+            - Re-compute least-squares H estimate on all of the inliners<br>
+            <br>
+            <br>
+            The following are best inliners found by RANSAC.
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_best_inliners_A.png" style="width: 100%; height: auto">
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_best_inliners_B.png" style="width: 100%; height: auto">
+            </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_mosaic_auto.jpg" style="width: 100%; height: auto">
+                <p> Final Result</p>
+            </div>
+        </div>
+    </div>
+
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Final Result - Comparison Between Manual and Automatic Image Stitching</h3>
+        
+        
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/steam_pano.jpg" style="width: 100%; height: auto">
+                <p> Manually Stitched</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/steam_mosaic_auto.jpg" style="width: 100%; height: auto">
+                <p> Automatically Stitched</p>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/ghirardelli_pano.jpg" style="width: 100%; height: auto">
+                <p> Manually Stitched</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/ghirardelli_mosaic_auto.jpg" style="width: 100%; height: auto">
+                <p> Automatically Stitched</p>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 10px;">
+                <img src="./data_out/backyard_pano.jpg" style="width: 100%; height: auto">
+                <p> Manually Stiched</p>
+            </div>
+            <div style="text-align: center; margin: 0 10px;">  
+                <img src="./data_out/backyard_mosaic_auto.jpg" style="width: 100%; height: auto">
+                <p> Automatically Stitched</p>
+            </div>
+        </div>
+
+    </div>
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Conclusion</h3>
+        
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            I believe the coolest thing I learned in this project is learn about and implementing automatic 
+            image stitiching. Building up to it made me appreciate and understand the benefits of the automatic stitching. I also found it cool
+            that we reused parts/tools from earlier in the semester. It showed me that how fundamental some of things
+            we learned are. 
+            <br> 
+            To me this project was very interesting because there are so many edge cases -- the slightest change in an image, or parameter can 
+            throw off the entire panorama. I'll be definitely coming back to this project to take a deeper dive in how to make it more robust.
+            I feel as though there are many ideas I can pull from the earlier projects that will help here especially in image processing.
+        </p>     
+    </div>
+</div>  
+<div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
+  
+</body>
+</html>
