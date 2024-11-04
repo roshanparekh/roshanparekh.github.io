@@ -31,8 +31,8 @@
   
   <div style="margin-top: 20px;">
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-        I took the pictures in this report with an iPhone 13 Pro. I used AF/AE lock to limit lighting changes in order to make a seamless tranistion between
-        photos of a moasic. However, for the Ghirardelli picture, I intentially wanted to see how would lighting difference look in a mosaic. 
+        I took the pictures in this report with an iPhone 13 Pro. I used AF/AE lock to limit lighting changes in order to make a seamless transitiion between
+        photos of a moasic. However, for the Ghirardelli picture, I intentially wanted to see how would a lighting difference look in a mosaic. 
     </p>
     </div>
     </div>
@@ -42,7 +42,7 @@
   <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Recover Homographies</h3>
       <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
 
-        To recover the homography that will be used to warp the entire image, I began by plotting corresponding points between the images in question. These correspsonding points
+        To recover the homography that will be used to warp the entire image, I began by plotting corresponding points between the images in question. These corresponding points
         denoted key features that are shared between the images.
 
         <br>
@@ -129,10 +129,10 @@
     <div style="margin-top: 40px;">
         <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Blending the Images into a Mosaic</h3>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-           I began by plotting more than 4 corresponding points, so I can the error minimization of least squares.
-           From there I warped the image to the I wanted to stay fixed. I was then able to calculate the bounding box for the
+           I began by plotting more than 4 corresponding points, so I can do error minimization of least squares.
+           From there I warped the image to the picture I wanted to stay fixed. I was then able to calculate the bounding box for the
            mosaic using the offsets from the warp. I also created binary masks of each image with respect to the mosaic space.
-           To create more of seamless transition, I did a distance transform on the masks. I used the distance transform to find
+           To create more of a seamless transition, I did a distance transform on the masks. I used the distance transform to find
            the alpha mask, which I then used to blend the images using a Laplacian stack.
         </p>
 
@@ -266,7 +266,7 @@
         <h4 style="margin-left: 240px; font-weight: bold;">1. Harris Interest Point Dectector</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
             First, I found the Harris corners. These are list of potential "corners" in the image. A corner in this case are windows of pixels that change
-            whenever there translation in x or y.
+            whenever there is a translation in x or y.
         </p>
 
         <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
@@ -294,7 +294,7 @@
         <h4 style="margin-left: 240px; font-weight: bold;">2. Adaptive Non-Maximal Suppression</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
             There are too many corners to compute a homography on and many of them aren't correspondences, so it wouldn't help even if we were to recover the homography
-            with all those corners. So, we must reduce the amount of corners to those that are represent strong corners using the Harris corner strength map. 
+            with all those corners. So, we must reduce the amount of corners to those that represent strong corners using the Harris corner strength map. 
         </p>
 
         <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
@@ -325,10 +325,10 @@
             </div>
         </div>
 
-        <h4 style="margin-left: 240px; font-weight: bold;">5. Feature Matching</h4>
+        <h4 style="margin-left: 240px; font-weight: bold;">4. Feature Matching</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
             We need to now see which features are the best matches. To do this, I computed the first and second nearest-neighbor of each feature descriptor, and then
-            divide the 1-NN by the 2-NN. If this ratio is within a threshold, then they are good corresponding pairs.
+            divided the 1-NN by the 2-NN. If this ratio is within a threshold, then they are good corresponding pairs.
             <br>
             Here are the locations of the corresponding features. We can see that there are some outliers; we need to take care of them before we can recover the
             homography.
@@ -343,7 +343,7 @@
             </div>
         </div>
 
-        <h4 style="margin-left: 240px; font-weight: bold;">6. 4-Point RANSAC (Robust Homography Estimate)</h4>
+        <h4 style="margin-left: 240px; font-weight: bold;">5. 4-Point RANSAC (Robust Homography Estimate)</h4>
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
            To filter out the outliers, we can use RANSAC which stands for <b>RAN</b>dom <b>SA</b>mple <b>C</b>oncensus. We essentially random sample 4 points,
            compute the homography, and see how many of the points we were left with after feature matching are inliers. We choose the 4 points that
@@ -424,13 +424,13 @@
         <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Conclusion</h3>
         
         <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
-            I believe the coolest thing I learned in this project is learn about and implementing automatic 
-            image stitiching. Building up to it made me appreciate and understand the benefits of the automatic stitching. I also found it cool
-            that we reused parts/tools from earlier in the semester. It showed me that how fundamental some of things
+            I believe the coolest thing I learned in this project was about implementing automatic 
+            image stitiching. Building up to it made me appreciate and understand the benefits of automatic stitching. I also found it cool
+            that we reused parts/tools from earlier in the semester. It showed me how fundamental some of the concepts
             we learned are. 
             <br> 
             To me this project was very interesting because there are so many edge cases -- the slightest change in an image, or parameter can 
-            throw off the entire panorama. I'll be definitely coming back to this project to take a deeper dive in how to make it more robust.
+            throw off the entire panorama. I'll definitely coming back to this project to take a deeper dive in how to make it more robust.
             I feel as though there are many ideas I can pull from the earlier projects that will help here especially in image processing.
         </p>     
     </div>
