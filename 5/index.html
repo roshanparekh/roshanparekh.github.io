@@ -1,0 +1,1029 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+  <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Project 5: Fun With Diffusion Models!</h1>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+  <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+<hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px">Introduction</h3>
+  
+  <div style="margin-top: 20px;">
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        In this project, we explored how diffusion models work and coded one up.
+      </p>
+    </div>
+    
+    
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h2 style="text-align: left; font-weight: bold; margin-left: 200px">Part A</h2>
+  
+  <div style="margin-top: 20px;">
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+        In this part, we explored the DeepFloyd diffusion model by Stability AI.
+    </p>
+    </div>
+
+
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 0: Setup</h3>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            Verifying we have imported everything correctly and checking against our text prompts.
+            We see that lower inference steps gives images that sometimes aren't resembaling the text prompt such
+            as the rocket ship. It seems as though simplier text prompts, or text prompts relating to probably common
+            images the model has seen often, are better at lower inference steps.
+
+            <br>
+            <br>
+            First row: num_inference_steps = 24
+            <br>
+            Second row: num_inference_steps = 
+            <br>
+            <br>
+            Random seed: 28582342
+            <br>
+            <br>
+            Prompts used:
+            <br>
+            - an oil painting of a snowy mountain village <br>
+            - a man wearing a hat <br>
+            - a rocket ship <br><br>
+
+            Results:
+        </p>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/snow_mountain.png" style="width: 100%; height: auto">
+            </div>
+
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/man_hat.png" style="width: 100%; height: auto">
+            </div>
+
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/rocket_ship.png" style="width: 100%; height: auto">
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+        
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/snow_mountain_2.png" style="width: 100%; height: auto">
+            </div>
+
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/man_hat_2.png" style="width: 100%; height: auto">
+            </div>
+
+            <div style="text-align: center; margin: 0 5px;">
+                <img src="./data_in/rocket_ship_2.png" style="width: 100%; height: auto">
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    
+
+    <div style="margin-top: 40px;">
+        <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1: Sampling Loops</h3>
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.1: Implementing the Forward Process</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            A key part of diffusion is the forward process, which takes a clean image and adds noise to it.
+            I created a function that adds random noise to an image for some time step t.
+            <br>
+            <br> 
+            Results of applying the forwarding function to a test image:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Berkeley Campanile</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_250.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_500.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_750.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=720</p>
+                </div>
+            </div>
+        </div>  
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.2: Classical Denoising</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can try denoising the noisy images using classical methods like Gaussian blur. However, as we see, it
+            isn't the best.
+            <br>
+            <br> 
+            Results of Gaussian blur:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_250.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_500.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_750.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=720</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-top: 10px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_blur_250.png" style="width: 100%; height: auto">
+                    <p>Gaussian Blur Denoising at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_blur_500.png" style="width: 100%; height: auto">
+                    <p>Gaussian Blur Denoising at t=500</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_blur_750.png" style="width: 100%; height: auto">
+                    <p> Gaussian Blur Denoising at t=750</p>
+                </div>
+            </div>
+        </div>  
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.3: One-Step Denoising</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can train models to denoise images. Here are the results of a one-step denoising using the DeepFloyd model.
+            We can notice that the one-step denosing at t=750 doesn't look exactly like the Campanile. The final image is blurred 
+            and it isn't resemabling the original image that well.
+            <br>
+            <br> 
+            Results of One-Step Denosing:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_250.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_500.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noise_750.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=720</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-top: 10px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_onestep_250.png" style="width: 100%; height: auto">
+                    <p>One-Step Denoised Campanile at t=250</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_onestep_500.png" style="width: 100%; height: auto">
+                    <p>One-Step Denoised Campanile at t=500</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_onestep_750.png" style="width: 100%; height: auto">
+                    <p>One-Step Denoised Campanile at t=750</p>
+                </div>
+            </div>
+        </div>
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.4: Iterative Denoising</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            The denoising process can be greatly improved by iterativly denoising the image. This can be thought of
+            as a linear interpolation between the signal and noise, and we are getting closer to the signal at each time step.
+            <br>
+            <br> 
+            Results of iterative denoising:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noisy_90.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=90</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noisy_240.png" style="width: 100%; height: auto">
+                    <p>Noisy Campanile at t=240</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noisy_390.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=390</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noisy_540.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=540</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_noisy_690.png" style="width: 100%; height: auto">
+                    <p> Noisy Campanile at t=690</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-top: 10px; margin-left: 240px; margin-right: 240px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Original Campanile</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_iter_denoised.png" style="width: 100%; height: auto">
+                    <p>Iteratively Denoised Campanile</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_onestep_denoised.png" style="width: 100%; height: auto">
+                    <p>One-Step Denoised Campanile</p>
+                </div>
+
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_onestep_denoised.png" style="width: 100%; height: auto">
+                    <p>One-Step Denoised Campanile</p>
+                </div>
+        
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_gauss_blur.png" style="width: 100%; height: auto">
+                    <p>Gaussian Blurred Campanile</p>
+                </div>
+                
+            </div>
+
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.5: Diffusion Model Sampling</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            The diffusion model can also be used to generate images from scratch. We do this by letting the diffusion model denoise
+            pure noise. However, these aren't the best images; it is noticeable that something isn't right.
+            <br>
+            <br> 
+            Results of sampling:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/diff_sample_1.png" style="width: 100%; height: auto">
+                    <p>Sample 1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/diff_sample_2.png" style="width: 100%; height: auto">
+                    <p>Sample 2</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/diff_sample_3.png" style="width: 100%; height: auto">
+                    <p>Sample 3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/diff_sample_4.png" style="width: 100%; height: auto">
+                    <p>Sample 4</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/diff_sample_5.png" style="width: 100%; height: auto">
+                    <p>Sample 5</p>
+                </div>
+            
+            </div>
+        </div>
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.6: Classifier-Free Guidance (CFG)</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can improve the sampled results from before by implementing Classifier-Free Guidance. This method "nudges" the model
+            into giving something more sensical.
+            <br>
+            <br> 
+            Results CFG sampling:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/cfg_1.png" style="width: 100%; height: auto">
+                    <p>Sample 1 with CFG</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/cfg_2.png" style="width: 100%; height: auto">
+                    <p>Sample 2 with CFG</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/cfg_3.png" style="width: 100%; height: auto">
+                    <p>Sample 3 with CFG</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/cfg_4.png" style="width: 100%; height: auto">
+                    <p>Sample 4 with CFG</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/cfg_5.png" style="width: 100%; height: auto">
+                    <p>Sample 5 with CFG</p>
+                </div>
+            
+            </div>
+        </div>
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.7: Image-to-image Translation</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can also use the model to do image to image translation. This is achieved by taking a test image, then adding
+            some noise to it, and try to force it back onto the image manifold without any conditioning.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+        
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.7.1: Editing Hand-Drawn and Web Images</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can also try to force drawings onto the image manifold.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/sw.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/volc.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_1.png" style="width: 100%; height: auto">
+                    <p>i_start=1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_3.png" style="width: 100%; height: auto">
+                    <p>i_start=3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_5.png" style="width: 100%; height: auto">
+                    <p>i_start=5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_7.png" style="width: 100%; height: auto">
+                    <p>i_start=7</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_10.png" style="width: 100%; height: auto">
+                    <p>i_start=10</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear_sde_20.png" style="width: 100%; height: auto">
+                    <p>i_start=20</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bear.png" style="width: 100%; height: auto">
+                    <p>Original</p>
+                </div>            
+            </div>
+        </div>
+
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.7.2: Inpainting</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can use the diffusion model to add specific content in areas we choose, and it should smeamlessly blend in.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Campanile</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_mask.png" style="width: 100%; height: auto">
+                    <p>Mask</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_replace.png" style="width: 100%; height: auto">
+                    <p>Hole to Fill</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_inpaint.png" style="width: 100%; height: auto">
+                    <p>Campanile Inpainted</p>
+                </div>                       
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Campanile</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_mask.png" style="width: 100%; height: auto">
+                    <p>Mask</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_replace.png" style="width: 100%; height: auto">
+                    <p>Hole to Fill</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_inpaint.png" style="width: 100%; height: auto">
+                    <p>Campanile Inpainted</p>
+                </div>                       
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/giraffe.png" style="width: 100%; height: auto">
+                    <p>Giraffe</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/giraffe_mask.png" style="width: 100%; height: auto">
+                    <p>Mask</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/giraffe_replace.png" style="width: 100%; height: auto">
+                    <p>Hole to Fill</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/giraffe_inpaint.png" style="width: 100%; height: auto">
+                    <p>Giraffe Inpainted</p>
+                </div>                       
+            </div>
+        </div>
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.7.3: Text-Conditional Image-to-image Translation</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can force it to a certain image using text prompts. Even though some of the output pictures aren't exactly like the text prompt, 
+            we see that the output as it gets closer to the original image, starts to have the same structure as the original, which is
+            granted.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_1.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_3.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_5.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_7.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 7</p>
+                </div>   
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_10.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 10</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camp_text_20.png" style="width: 100%; height: auto">
+                    <p>Rocket Ship at noise level 20</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/campanile.png" style="width: 100%; height: auto">
+                    <p>Original Campanile</p>
+                </div>                        
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_1.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_3.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_5.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_7.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 7</p>
+                </div>   
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_10.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 10</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train_text_20.png" style="width: 100%; height: auto">
+                    <p>Dog at noise level 20</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/train.png" style="width: 100%; height: auto">
+                    <p>Original Train</p>
+                </div>                        
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_1.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 1</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_3.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 3</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_5.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 5</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_7.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 7</p>
+                </div>   
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_10.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 10</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge_text_20.png" style="width: 100%; height: auto">
+                    <p>Village at noise level 20</p>
+                </div>    
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/bridge.png" style="width: 100%; height: auto">
+                    <p>Original Train</p>
+                </div>                        
+            </div>
+        </div>
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.8: Visual Anagrams</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can also use the diffusion model to create visual anagrams. We denoise two images/pure noise, then average them together
+            and repeat the process. For one noise, we will flip it when we are sending it through the model, and reflip it when we use it
+            get the average.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/oil_painting.png" style="width: 100%; height: auto">
+                    <p>An Oil Painting of an Old Man</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/oil_painting_filp.png" style="width: 100%; height: auto">
+                    <p>An Oil Painting of People around a Campfire</p>
+                </div>                                       
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/dog_anagram.png" style="width: 100%; height: auto">
+                    <p>A photo of a dog</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/dog_anagram_flip.png" style="width: 100%; height: auto">
+                    <p>A photo of a man</p>
+                </div>                                       
+            </div>
+        </div>
+
+      
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/coast_anagram.png" style="width: 100%; height: auto">
+                    <p>A photo of the Amalfi Coast</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/coast_anagram_flip.png" style="width: 100%; height: auto">
+                    <p>An oil painting of a snowy mountain village</p>
+                </div>                                       
+            </div>
+        </div>
+
+
+        <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1.9: Hybrid Images</h4>
+
+        <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+            We can also use the diffusion model to create hybrid images. We just do a high pass filter and low pass filter on 
+            different set of noises we are sending through the model, then sum them after applying the filters.
+            <br>
+            <br> 
+            Results:
+        </p>
+    
+        <div style="margin-top: 10px;">        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+                
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/skull_hybrid.png" style="width: 100%; height: auto">
+                    <p>Skull/Waterfall</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/oldman_hybrid.png" style="width: 100%; height: auto">
+                    <p>Old man/Village</p>
+                </div>     
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/village_hybrid.png" style="width: 100%; height: auto">
+                    <p>Skull/Village</p>
+                </div>                                   
+            </div>
+        </div>
+    </div>
+
+  <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+<div style="margin-top: 40px;">
+  <h2 style="text-align: left; font-weight: bold; margin-left: 200px"> Part B</h2>
+  <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 1: Training a Single-Step Denoising UNet</h3>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+
+        We started by creating a single step denoising UNet. We trained it on MNIST dataset.
+
+
+      </p>
+
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/denoising_process.png" style="width: 100%; height: auto">
+                <p>Visualization of the denoising process on sample images</p>
+            </div>
+        </div>
+    </div>  
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/loss_curve_denoise.png" style="width: 100%; height: auto">
+                <p>Loss curve from training the single-step denoiser</p>
+            </div>
+        </div>
+    </div>  
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/denoise_e1.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 1 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/denoise_e5.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 5 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/out_dist_denoise.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set with varying noise levels.</p>
+            </div>
+        </div>
+    </div>  
+
+
+
+    <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2: Training a Diffusion Model</h3>
+    <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Adding Time Conditioning to UNet</h4>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+
+        Now to move onto creating a diffusion model which iteratively denoises an image. The UNet is trained using DDPM.
+        After training our model will be able to iteratively denoise images. However, it won't be great because we haven't
+        conditioned fully it. This is similar to above where the denoising was amazing but the images were still nonsensical.
+        Basically, the images aren't on totally on image manifold, yet; they are close.
+        <br>
+        We have just used time conditioning.
+      </p>
+
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/diffusion_e20_loss.png" style="width: 100%; height: auto">
+                <p>Loss curve from training the diffusion model after 20 epochs</p>
+            </div>
+        </div>
+    </div>  
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/diffusion_e5_samples.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 5 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/diffusion_e20_samples.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 20 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+
+
+    <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Adding Class-Conditioning to UNet</h4>
+      <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+
+        Now we will add class-condition to the UNet, this will help it to denoise images even better, since they will be trained
+        on the specific numbers and their labels.
+
+        <br>
+        <br>
+
+         I ran into a bug that was hard for me to fix. It seems as though I am training correctly on the labels due to
+         the loss curve being good. However, I am not sampling correctly because when I sample with both models, the same image
+         appears. It was hard for me to fix, because it is sampling better images than the time conditioned UNet.
+
+
+      </p>
+
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/diffusion_e20_loss.png" style="width: 100%; height: auto">
+                <p>Loss curve from training the diffusion model after 20 epochs</p>
+            </div>
+        </div>
+    </div>  
+
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/class_cond_e5.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 5 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+    <div style="margin-top: 20px;">        
+        <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
+            <div style="text-align: center; margin: 0 1px;">
+                <img src="./data_in/class_cond_e20.png" style="width: 100%; height: auto">
+                <p>Results on digits from the test set after 20 epoch of training</p>
+            </div>
+        </div>
+    </div>  
+
+        
+
+</div>  
+<div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>
+  
+</body>
+</html>
