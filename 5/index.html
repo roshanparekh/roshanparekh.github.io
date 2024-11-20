@@ -985,13 +985,17 @@
 
         <br>
         <br>
+
+        I ran into a bug that was hard for me to fix. It seems as though I am training correctly on the labels due to the loss curve being good. However, I am not sampling correctly because when I sample with both models, the same image appears. It was hard for me to fix, because it is sampling better images than the time conditioned UNet.
+
+
       </p>
 
 
     <div style="margin-top: 20px;">        
         <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
             <div style="text-align: center; margin: 0 1px;">
-                <img src="./data_in/diffusion_e20_loss.png" style="width: 100%; height: auto">
+                <img src="./data_in/class_cond_e5.png" style="width: 100%; height: auto">
                 <p>Loss curve from training the diffusion model after 20 epochs</p>
             </div>
         </div>
@@ -1000,7 +1004,7 @@
     <div style="margin-top: 20px;">        
         <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 240px; margin-right: 240px;">
             <div style="text-align: center; margin: 0 1px;">
-                <img src="./data_in/epoch5_cond.png" style="width: 100%; height: auto">
+                <img src="./data_in/class_cond_e20.png" style="width: 100%; height: auto">
                 <p>Results on digits from the test set after 5 epoch of training</p>
             </div>
         </div>
