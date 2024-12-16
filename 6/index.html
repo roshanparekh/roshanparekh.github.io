@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.77">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+
+    <h1 style="text-align: center; font-weight: bold; margin-top: 40px;">Final Project: Neural Radiance Field!</h1>
+    <h2 style="text-align: center; font-weight: normal; color: gray;">Roshan Parekh</h2>
+    <h2 style="text-align: center; font-weight: normal; color: gray;">Project Report</h2>
+
+    <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+    <div style="margin-top: 40px;">
+        
+        <h2 style="text-align: left; font-weight: bold; margin-left: 200px">Introduction</h2>
+    
+        <div style="margin-top: 20px;">
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                In this project, I implemented and explored NeRF. I started with implementing a neural field for a 2D image before moving on and extending the idea
+                to a full neural radiance field.
+            </p>
+        </div>
+        
+        
+        <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+        <h2 style="text-align: left; font-weight: bold; margin-left: 200px">Part 1: Fit a Neural Field to a 2D Image</h2>
+    
+        <div style="margin-top: 40px;">
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Architecture</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                The architecture used for the 2D Neural Field was a "Multilayer Perceptron (MLP) network with Sinusoidal Positional Encoding (PE) 
+                that takes in the 2-dim pixel coordinates, and output the 3-dim pixel colors."
+            </p>
+        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/mlp_img.jpg" style="width: 75%; height: auto">
+                    <p> Structure of the network's architecture from the spec</p>
+                </div>
+            </div>
+
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Training & Sampling</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                The network is structured with multiple layers and utilizes activation functions such as ReLU and Sigmoid to ensure accurate color predictions. 
+                To prevent running out of memory, it trains in batches.
+                During training, I adjusted the network's parameters such as the frequency level, channel size, learning rate, layer depth, etc to see
+                how it affects the result.
+            </p>
+
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Outcomes:</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                I tuned the parameters the same way for both. 
+                I assuming the tuned image is more "blended" due to the max frequency being lower for the positional encoding. This may have caused the
+                network to lose the detail positional information, which caused it to generalize the color. Also, lowering the channel size for the layers
+                also added to the "blended" effect because the network is capturing less information.
+
+                <br>
+                <br>
+                I trained both images with 1000 iterations and randomly sampled 10,000 pixels at each iteration.
+            </p>
+        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/fox_image.png" style="width: 40%; height: auto">
+                    <p> Original Fox Image </p>
+                </div>
+            </div>
+            
+            <b style="margin-left: 240px; margin-right: 240px; margin-top: 20px"> 1. L = 10, Channel Size = 256 </b>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/fox_over_iterations.png" style="width:100%; height: auto">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/graph_fox.png" style="width:85%; height: auto">
+                </div>
+            </div>
+        
+            <b style="margin-left: 240px; margin-right: 240px; margin-top: 20px"> 2. L = 4, Channel Size = 128 </b>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/fox_over_iterations_tuned.png" style="width:100%; height: auto">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/graph_fox_tuned.png" style="width:85%; height: auto">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/wheeler.JPG" style="width: 30%; height: auto">
+                    <p> Original Wheeler Image </p>
+                </div>
+            </div>
+            
+            <b style="margin-left: 240px; margin-right: 240px; margin-top: 20px"> 1. L = 10, Channel Size = 256 </b>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/wheeler_over_iterations.png" style="width:100%; height: auto">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/graph_wheeler.png" style="width:85%; height: auto">
+                </div>
+            </div>
+        
+            <b style="margin-left: 240px; margin-right: 240px; margin-top: 20px"> 2. L = 4, Channel Size = 128 </b>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/wheeler_over_iterations_tuned.png" style="width:100%; height: auto">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/graph_wheeler_tuned.png" style="width:85%; height: auto">
+                </div>
+            </div>
+        </div>
+
+
+        <hr style="border: 1px solid #ccc; margin: 40px 0; margin-left: 200px; margin-right: 200px">
+        <h2 style="text-align: left; font-weight: bold; margin-left: 200px">Part 2: Fit a Neural Radiance Field from Multi-view Images</h2>
+    
+        <div style="margin-top: 40px;">
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2.1: Create Rays from Cameras</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                In order create rays from the cameras, we implemented three functions that work together to produce the rays.
+            </p>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Camera to World Coordinate Conversion</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                This function takes a c2w matrix (or extrinsic matrix) that transofrms the camera coordinates to the world coordinates. This was matrix multiplication between
+                c2w and x_c, the coordinate respect to camera space. 
+                I did the batched matrix multiplication using einsum, because I batched the inputs by number of images and number of pixels. Using einsum made it easier because
+                I didn't have to worry about reshaping; the einsum notation took care of it.
+                
+            </p>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Pixel to Camera Coordinate Conversion</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                This function takes pixel coordinates multiplies it with the intrinsic matrix to output the camera coordinate of the pixel. Similarly, I used einsum to do the
+                batch matrix multiplication.
+                <br>
+                <br>
+                Intrinsic Matrix: 
+                <br>
+                f is the focal length and o is the principal point
+                \begin{align}
+                \mathbf{K} = \begin{bmatrix} f_x & 0 & o_x \\ 0 & f_y & o_y \\ 0 & 0 & 1 \end{bmatrix} 
+                \end{align}
+            </p>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Pixel to Ray</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                This function creates the rays of each pixel in the image with respect world coordinate space. The origin ray is the location of the camera, and the 
+                direction of the ray can be found by choosing a pixel and finding its world coordinate and subtracting it from the orign ray. 
+                This computation gives the ray through that point. We used the normalized ray direction so we divided by the norm.
+                \begin{align} \mathbf{r}_o = -\mathbf{R}_{3\times3}^{-1}\mathbf{t} \end{align}
+                \begin{align} \mathbf{r}_d = \frac{\mathbf{X_w} - \mathbf{r}_o}{||\mathbf{X_w} - \mathbf{r}_o||_2} \end{align}
+
+            </p>
+
+        
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2.2: Sampling</h3>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Sampling Rays from Images</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                We random sample rays from images. This function samples N rays, or pixels, from the image, and returns the ray origin, direction, and pixel color. This function
+                leverages the helper functions from part 2.1. One caveat is that we need to make sure to translate the pixel grid by +0.5 to get the center of the pixel, because
+                that is where the origin is. 
+            </p>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Sampling Points along Rays</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                This function uniformly samples points along the ray. If we are training, then it introduces a slight perbutation to the points. This prevents the model
+                from overfitting. The pebutation can't be too large otherwise the model won't learn properly.
+            </p>
+
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2.3: Putting the Dataloading All Together</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                We created a custom dataset that randomly samples pixels from the multiview images.
+            </p>
+            
+        
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/point_cloud.png" style="width: 100%; height: auto">
+                    <p> 100 randomly sampled rays over the 100 training images <br> (1 ray per image)</p>
+                </div>
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/camera_rays.png" style="width: 83%; height: auto">
+                    <p> 100 randomly sampled rays over one of the training images</p>
+                </div>
+            </div>
+
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2.4: Neural Radiance Field</h3>
+            <h4 style="text-align: left; font-weight: bold; margin-left: 200px"> Architecture</h4>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                To design a neural network capable of mapping 3D world coordinates and ray directions to pixel values, 
+                we need a deeper architecture. 
+                I used a predefined structure consisting of 12 linear layers, ReLU activations, and the positional encoding (PE) 
+                of the x-coordinates and ray directions which are concatenated into the middle of the MLP. 
+                The network is designed to output two results: a 1D density value and a 3D RGB vector. 
+                This means the network predicts not just the color but also the density of the 3D points
+            </p>
+                    
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/mlp_nerf.png" style="width: 95%; height: auto">
+                    <p> Structure of the network's architecture from the spec</p>
+                </div>
+            </div>
+
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Part 2.5: Volume Rendering</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                To get pixel color of the view, we essentially add up a weighted representation of the color of each point the model
+                predicted along the ray. I created a function that implemented the discrete approximation of the continuous volume rendering
+                function.
+                <br>
+                <br>
+                Continuous version of the volume rendering function:
+                \begin{align} C(\mathbf{r})=\int_{t_n}^{t_f} T(t) \sigma(\mathbf{r}(t))
+                \mathbf{c}(\mathbf{r}(t), \mathbf{d}) d t, \text { where } T(t)=\exp \left(-\int_{t_n}^t \sigma(\mathbf{r}(s)) d s\right)
+                \end{align}
+                <br>
+                <br>
+                Discrete approximation of the volume rendering function:
+                    \begin{align}
+                    \hat{C}(\mathbf{r})=\sum_{i=1}^N T_i\left(1-\exp \left(-\sigma_i \delta_i\right)\right) \mathbf{c}_i, \text { where } T_i=\exp
+                    \left(-\sum_{j=1}^{i-1} \sigma_j \delta_j\right) 
+                    \end{align}
+            </p>
+
+            <h3 style="text-align: left; font-weight: bold; margin-left: 200px"> Results:</h3>
+            <p style="margin-left: 240px; margin-right: 240px; margin-top: 20px">
+                I trained over 10,000 iterations. At each iteration, I randomly sampled 50 images and 10,000 rays over the images, so 200 rays per image.
+                I used the hyperparameters outlined in the project spec.
+            </p>
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_over_iterations.png" style="width: 100%; height: auto">
+                    <p> Visualization of training</p>
+                </div>                
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_psnr_training.png" style="width: 100%; height: auto">
+                    <p> PSNR on Training Data</p>
+                </div>       
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_psnr_validiation.png" style="width: 100%; height: auto">
+                    <p> PSNR on Validation Data</p>
+                </div>           
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 40px; margin-left: 200px; margin-right: 200px;">
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_render_background.gif" style="width: 100%; height: auto">
+                    <p> Background Color</p>
+                </div> 
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_render.gif" style="width: 100%; height: auto">
+                    <p> Render Model</p>
+                </div>                       
+                <div style="text-align: center; margin: 0 5px;">
+                    <img src="./data_in/nerf_render_depth.gif" style="width: 100%; height: auto">
+                    <p> Depth Map</p>
+                </div>          
+            </div>
+        </div>                                         
+    </div>  
+    <div style="background-color: white; padding: 20px; text-align: center; margin-top: 40px;"></div>    
+</body>
+</html>
